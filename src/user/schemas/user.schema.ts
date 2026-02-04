@@ -1,29 +1,49 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
-
 @Schema({ timestamps: true })
-export class User extends Document {
-  //Username
+export class User {
   @Prop({
     required: true,
     trim: true,
     lowercase: true,
   })
-  username: string;
-
-  //Email
+  firstname: string;
+  @Prop({
+    required: false,
+    trim: true,
+    lowercase: true,
+  })
+  lastname?: string;
   @Prop({
     required: true,
     unique: true,
-    trim: true,
     lowercase: true,
+    trim: true,
+  })
+  username: string;
+
+  @Prop({
+    required: true,
+    unique: true,
+    lowercase: true,
+    trim: true,
   })
   email: string;
 
-  //Password
   @Prop({
     required: true,
+    minlength: [8, 'Password must be at least 8 characters long'],
+    trim: true,
   })
   password: string;
+
+  @Prop({
+    enum: {
+      values: ['user', 'admin'],
+      default: 'user',
+      message: 'Role must be either user or admin',
+    },
+  })
+  role: 'user' | 'admin';
 }
-export const UserSchema = SchemaFactory.createForClass(User);
+
+export const userSchema = SchemaFactory.createForClass(User)

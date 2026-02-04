@@ -1,46 +1,31 @@
 import {
-  BadRequestException,
+  ConflictException,
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
+import { UserRepository } from './repositories/user.repository';
+import { CreateUserDto } from 'src/common/dto/create-user.dto';
 import { User } from './schemas/user.schema';
-import { Model, MongooseError } from 'mongoose';
-import { CreateUserDTO } from './user-dto/create.user.dto';
-import bcrypt from 'bcrypt';
-import { MongoServerError } from 'mongodb';
+
 @Injectable()
 export class UserService {
-  constructor(
-    @InjectModel(User.name) private readonly userRepositry: Model<User>,
-  ) {}
+  constructor(private readonly userRepository: UserRepository) {}
 
-  // Create the user
-  async createUser(user: CreateUserDTO) {
+  async createUser(userDto: CreateUserDto): Promise<User> {
     try {
-      const hashedPassword = await bcrypt.hash(user.password, 10);
-
-      const createdUser = await this.userRepositry.create({
-        username: user.username,
-        email: user.email,
-        password: hashedPassword,
-      });
-      if (!createdUser) {
-        throw new BadRequestException('User not created!');
+      const user = await this.userRepository.createUser(userDto);
+      console.log('User in user.service.ts', user);
+      return user;
+    } catch (error) {
+      if (error.code === 11000) {
+        throw new ConflictException({
+          success:false,
+          message: 'User already exists',
+          field: 'email',
+          errorCode: 'USER_ALREADY_EXISTS',
+        });
       }
-      return {
-        sucess: true,
-        data: {
-          _id: createdUser._id,
-          username: createdUser.username,
-          email: createdUser.email,
-        },
-      };
-    } catch (error: unknown) {
-      if (error instanceof MongoServerError && error.code === 11000) {
-        console.log(error);
-        throw new BadRequestException('User already exist!');
-      }
+      throw new InternalServerErrorException('Failed to create user');
     }
   }
 }
