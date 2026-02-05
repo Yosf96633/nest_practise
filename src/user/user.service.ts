@@ -5,13 +5,13 @@ import {
 } from '@nestjs/common';
 import { UserRepository } from './repositories/user.repository';
 import { CreateUserDto } from 'src/common/dto/create-user.dto';
-import { User } from './schemas/user.schema';
+import { User , UserDocument } from './schemas/user.schema';
 
 @Injectable()
 export class UserService {
   constructor(private readonly userRepository: UserRepository) {}
 
-  async createUser(userDto: CreateUserDto): Promise<User> {
+  async createUser(userDto: CreateUserDto): Promise<UserDocument> {
     try {
       const user = await this.userRepository.createUser(userDto);
       return user;
