@@ -14,7 +14,6 @@ export class UserService {
   async createUser(userDto: CreateUserDto): Promise<User> {
     try {
       const user = await this.userRepository.createUser(userDto);
-      console.log('User in user.service.ts', user);
       return user;
     } catch (error) {
       if (error.code === 11000) {

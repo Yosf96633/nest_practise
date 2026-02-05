@@ -31,7 +31,6 @@ export class User {
 
   @Prop({
     required: true,
-    minlength: [8, 'Password must be at least 8 characters long'],
     trim: true,
   })
   password: string;
@@ -42,6 +41,7 @@ export class User {
       default: 'user',
       message: 'Role must be either user or admin',
     },
+    default : "user"
   })
   role: 'user' | 'admin';
 }
