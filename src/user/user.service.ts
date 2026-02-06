@@ -2,10 +2,11 @@ import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { UserRepository } from './repositories/user.repository';
 import { CreateUserDto } from 'src/common/dto/create-user.dto';
-import { User , UserDocument } from './schemas/user.schema';
+import { User, UserDocument } from './schemas/user.schema';
 
 @Injectable()
 export class UserService {
@@ -18,7 +19,7 @@ export class UserService {
     } catch (error) {
       if (error.code === 11000) {
         throw new ConflictException({
-          success:false,
+          success: false,
           message: 'User already exists',
           field: 'email',
           errorCode: 'USER_ALREADY_EXISTS',
@@ -26,5 +27,15 @@ export class UserService {
       }
       throw new InternalServerErrorException('Failed to create user');
     }
+  }
+
+  async findUserByEmail(email: string): Promise<UserDocument> {
+  const user = await this.userRepository.findByEmail(email);
+
+    if (user === null) {
+      throw new UnauthorizedException('Email not found!');
+    }
+
+    return user;
   }
 }
