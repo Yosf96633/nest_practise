@@ -2,6 +2,7 @@ import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { UserRepository } from './repositories/user.repository';
@@ -30,12 +31,32 @@ export class UserService {
   }
 
   async findUserByEmail(email: string): Promise<UserDocument> {
-  const user = await this.userRepository.findByEmail(email);
+    const user = await this.userRepository.findByEmail(email);
 
     if (user === null) {
       throw new UnauthorizedException('Email not found!');
     }
 
+    return user;
+  }
+
+  async findUserById(id: string) {
+    const user = await this.userRepository.findById(id);
+    if (!user)
+      throw new NotFoundException({
+        message: `User not found!`,
+        cause: `User with id ${id} not found in database`,
+      });
+    return user;
+  }
+
+  async findUserAndDelete(id: string) {
+    const user = await this.userRepository.deleteUserById(id);
+    if (!user)
+      throw new NotFoundException({
+        message: `User not found!`,
+        cause: `User with id ${id} not found in database`,
+      });
     return user;
   }
 }

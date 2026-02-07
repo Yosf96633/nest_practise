@@ -4,12 +4,9 @@ import {
   ExecutionContext,
   ForbiddenException,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
-
 @Injectable()
 export class HasToken implements CanActivate {
-  constructor(private readonly jwtService: JwtService) {}
   private extractToken(req: Request): string | null {
     const authorizationHeader = req.headers.authorization;
     if (!authorizationHeader) return null;
@@ -20,7 +17,6 @@ export class HasToken implements CanActivate {
     const request = context.switchToHttp().getRequest<Request>();
 
     const token = this.extractToken(request);
-
     if (!token) return true;
     else {
       throw new ForbiddenException();

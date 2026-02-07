@@ -45,20 +45,22 @@ export class AuthService {
   async login(loginUserDto: LoginUserDto) {
     const { email, password } = loginUserDto;
     const user = await this.userService.findUserByEmail(email);
-    //const hashedPassword = await this.hashPassword(password);
-
-    console.log("Email and password:"  , email , password)
-    console.log("User :" , user)
-    //console.log(hashedPassword)
-   
-
     const result = await this.isPasswordCorrect(user.password, password);
-   console.log(result)
     if (!result) {
       throw new UnauthorizedException('Invalid email or password!');
     }
     return user;
+  }
 
+  async getProfile(id: string) {
+    const user = await this.userService.findUserById(id);
+    const { password: _, ...x } = user.toObject();
+    return x;
+  }
 
+  async deleteUser(id: string) {
+    const user = await this.userService.findUserAndDelete(id);
+    const { password: _, ...x } = user.toObject();
+    return x;
   }
 }

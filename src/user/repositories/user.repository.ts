@@ -25,4 +25,22 @@ export class UserRepository {
       throw error;
     }
   }
+
+  async findById(id: string): Promise<UserDocument | null> {
+    try {
+      const user = await this.userModel.findById(id);
+      return user;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async deleteUserById(id: string) {
+    try {
+      const user = await this.userModel.findByIdAndDelete(id);
+      return user;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
